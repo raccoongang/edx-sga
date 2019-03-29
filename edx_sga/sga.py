@@ -13,6 +13,9 @@ import pytz
 
 from functools import partial
 
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
+
 from courseware.models import StudentModule
 
 from django.core.exceptions import PermissionDenied
@@ -21,6 +24,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.template import Context, Template
 
+from edeos.tasks import send_api_request
 from student.models import user_by_anonymous_id
 from submissions import api as submissions_api
 from submissions.models import StudentItem as SubmissionsStudent
@@ -601,6 +605,32 @@ class StaffGradedAssignmentXBlock(XBlock):
         state['comment'] = request.params.get('comment', '')
         module.state = json.dumps(state)
         module.save()
+
+        course_id = module.course_id.to_deprecated_string()
+        course = modulestore().get_course(module.course_id)
+        if course.edeos_enabled:
+            payload = {
+                'student_id': module.student.email,
+                'course_id': course_id,
+                'org': course.org,
+                'client_id': course.edeos_key,
+                'event_type': 13,
+                'uid': self.location.to_deprecated_string(),  # problem id
+                'event_details': {
+                    "event_type_verbose": "grade_manual_assignment",
+                    "grade": float(score) / self.max_score()
+                }
+            }
+            data = {
+                'payload': payload,
+                'secret': course.edeos_secret,
+                'key': course.edeos_key,
+                'base_url': course.edeos_base_url,
+                'api_endpoint': 'transactions_store'
+            }
+
+            send_api_request.delay(data)
+
         log.info(
             "enter_grade for course:%s module:%s student:%s",
             module.course_id,
