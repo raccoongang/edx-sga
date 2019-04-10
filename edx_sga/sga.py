@@ -615,7 +615,8 @@ class StaffGradedAssignmentXBlock(XBlock):
                 'org': course.org,
                 'client_id': course.edeos_key,
                 'event_type': 13,
-                'uid': self.location.to_deprecated_string(),  # problem id
+                'uid': "{}_{}".format(self.location.to_deprecated_string(),  # problem id
+                                      module.student.email),
                 'event_details': {
                     "event_type_verbose": "grade_manual_assignment",
                     "grade": float(score) / self.max_score()
