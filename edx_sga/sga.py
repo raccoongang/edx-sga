@@ -25,6 +25,7 @@ from django.conf import settings
 from django.template import Context, Template
 
 from edeos.tasks import send_api_request
+from edeos.utils import get_user_id
 from student.models import user_by_anonymous_id
 from submissions import api as submissions_api
 from submissions.models import StudentItem as SubmissionsStudent
@@ -610,7 +611,7 @@ class StaffGradedAssignmentXBlock(XBlock):
         course = modulestore().get_course(module.course_id)
         if course.edeos_enabled:
             payload = {
-                'student_id': module.student.email,
+                'student_id': get_user_id(module.student),
                 'course_id': course_id,
                 'org': course.org,
                 'client_id': course.edeos_key,
