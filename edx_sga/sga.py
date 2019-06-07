@@ -609,7 +609,7 @@ class StaffGradedAssignmentXBlock(XBlock):
 
         course_id = module.course_id.to_deprecated_string()
         course = modulestore().get_course(module.course_id)
-        if course.edeos_enabled:
+        if course.edeos_enabled and self.is_instructor():
             payload = {
                 'student_id': get_user_id(module.student),
                 'course_id': course_id,
