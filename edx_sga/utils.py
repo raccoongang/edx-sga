@@ -4,13 +4,12 @@ Utility functions for the SGA XBlock
 import hashlib
 import os
 import datetime
-import time
 from functools import partial
 import pytz
 import six
 
-from django.conf import settings
 from django.core.files.storage import default_storage
+from django.utils import timezone
 
 from edx_sga.constants import BLOCK_SIZE
 
@@ -35,18 +34,12 @@ def get_file_modified_time_utc(file_path):
     """
     Gets the UTC timezone-aware modified time of a file at the given file path
     """
-    file_timezone = (
-        # time.tzname returns a 2 element tuple:
-        #   (local non-DST timezone, e.g.: 'EST', local DST timezone, e.g.: 'EDT')
-        pytz.timezone(time.tzname[0])
-        if settings.DEFAULT_FILE_STORAGE == 'django.core.files.storage.FileSystemStorage'
-        else pytz.utc
-    )
-    return file_timezone.localize(
-        default_storage.modified_time(file_path)
-    ).astimezone(
-        pytz.utc
-    )
+    modified_dt = default_storage.modified_time(file_path)
+
+    if timezone.is_naive(modified_dt):
+        modified_dt = timezone.make_aware(modified_dt)
+
+    return modified_dt.astimezone(pytz.utc)
 
 
 def get_sha1(file_descriptor):
