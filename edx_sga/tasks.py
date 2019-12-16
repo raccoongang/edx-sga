@@ -5,9 +5,9 @@ import logging
 import os
 import tempfile
 
+from celery import task  # pylint: disable=no-name-in-module, import-error
 from django.core.files.storage import default_storage  # lint-amnesty, pylint: disable=import-error
 
-from lms import CELERY_APP  # pylint: disable=no-name-in-module, import-error
 from submissions import api as submissions_api  # lint-amnesty, pylint: disable=import-error
 from student.models import user_by_anonymous_id  # lint-amnesty, pylint: disable=import-error
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -85,7 +85,7 @@ def _compress_student_submissions(zip_file_path, block_id, course_id, locator):
         default_storage.save(zip_file_path, tmp)
 
 
-@CELERY_APP.task
+@task
 def zip_student_submissions(course_id, block_id, locator_unicode, username):
     """
     Task to download all submissions as zip file
