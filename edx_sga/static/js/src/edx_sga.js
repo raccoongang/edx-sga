@@ -33,17 +33,20 @@ function StaffGradedAssignmentXBlock(runtime, element) {
                     var do_upload = $(content).find('.upload').html('');
                     $(content).find('p.error').html('');
                     $('<button/>')
-                        .text('Upload ' + data.files[0].name)
+                        .text(
+                            edx.StringUtils.interpolate(gettext('Upload {filename}'),
+                            {filename: data.files[0].name})
+                        )
                         .appendTo(do_upload)
                         .click(function() {
-                            do_upload.text('Uploading...');
+                            do_upload.text(gettext('Uploading...'));
                             var block = $(element).find(".sga-block");
                             var data_max_size = block.attr("data-max-size");
                             var size = data.files[0].size;
                             if (!_.isUndefined(size)) {
                                 //if file size is larger max file size define in env(django)
                                 if (size >= data_max_size) {
-                                    state.error = 'The file you are trying to upload is too large.';
+                                    state.error = gettext('The file you are trying to upload is too large.');
                                     render(state);
                                     return;
                                 }
@@ -54,7 +57,9 @@ function StaffGradedAssignmentXBlock(runtime, element) {
                 progressall: function(e, data) {
                     var percent = parseInt(data.loaded / data.total * 100, 10);
                     $(content).find('.upload').text(
-                        'Uploading... ' + percent + '%');
+                        edx.StringUtils.interpolate(gettext('Uploading... {percent} %'),
+                        {percent: percent})
+                    );
                 },
                 fail: function(e, data) {
                     /**
@@ -68,10 +73,10 @@ function StaffGradedAssignmentXBlock(runtime, element) {
                          * here, so no good way to inform the user of what the
                          * limit is.
                          */
-                        state.error = 'The file you are trying to upload is too large.';
+                        state.error = gettext('The file you are trying to upload is too large.');
                     } else {
                         // Suitably vague
-                        state.error = 'There was an error uploading your file.';
+                        state.error = gettext('There was an error uploading your file.');
 
                         // Dump some information to the console to help someone
                         // debug.
