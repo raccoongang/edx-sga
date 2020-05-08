@@ -175,3 +175,7 @@
 .sga-block table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
     background-color: #8dbdd8;
 }
+
+.sga-upload-success {
+    color: #008000 !important;
+}

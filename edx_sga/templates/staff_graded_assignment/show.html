@@ -7,23 +7,26 @@
        <b><%= display_name %></b>
     <% } %>
     <% if (uploaded) { %>
-      <p><b>File uploaded</b> 
-        <a href="<%= downloadUrl %>"><%= uploaded.filename %></a></p>
-    <% } else { %>
-      <p>No file has been uploaded.</p>
+      <p>
+        <b class="sga-upload-success">{% trans "File uploaded" %}</b>
+        <a href="<%= downloadUrl %>"><%= uploaded.filename %></a>
+      </p>
     <% } %>
     <% if (graded) { %>
-      <p>Your score is <%= graded.score %> / <%= max_score %><br/>
+      <p>{% trans "Your score is" %} <%= graded.score %> / <%= max_score %><br/>
         <% if (graded.comment) { %>
-          <b>Instructor comment</b> <%= graded.comment %>
+          <b>{% trans "Instructor comment" %}</b> <%= graded.comment %>
         <% } %>
         <% if (annotated) { %><br/>
-          <b>Annotated file from instructor</b>
+          <b>{% trans "Annotated file from instructor" %}</b>
           <a href="<%= annotatedUrl %>"><%= annotated.filename %></a>
         <% } %>
       </p>
     <% } else if (uploaded) { %>
-      {% trans "This assignment has not yet been graded." %}
+      <p class="sga-upload-success">
+        <span class="sga-upload-success">&#x2714</span>
+        {% trans "This assignment has not yet been graded." %}
+      </p>
     <% } %>
     <% if (upload_allowed) { %>
     <p>
@@ -34,7 +37,7 @@
       <% } %>
       <div class="upload">
         <input class="fileupload" type="file" name="assignment"/>
-        <button>Select a file</button>
+        <button>{% trans "Select a file" %}</button>
       </div>
     </p>
     <% } %>
@@ -132,7 +135,7 @@
     </div>
   </section>
 
-  <section aria-hidden="true" class="modal staff-modal" 
+  <section aria-hidden="true" class="modal staff-modal"
            style="height: 80%" id="{{ id }}-debug">
     <div class="inner-wrapper" style="color: black">
       <header><h2>{% trans "Staff Debug" %}</h2></header>
